@@ -44,7 +44,7 @@
      <label>FOCUS</label>
    </control> -->
 
-   <!-- Now Playing 304e5a-->
+<!-- Now Playing -->
 
    <control type="group">
 
@@ -53,10 +53,9 @@
          <width>1760</width>
          <height>150</height>
          <visible></visible>
-         <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),true)">
+         <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYLIST),true)">
            <effect type="slide" end="0,-300" time="500" delay="500" />
          </animation>
-
 
          <control type="image">
            <width>100%</width>
@@ -70,7 +69,7 @@
            <top>10</top>
            <width>130</width>
            <height>130</height>
-           <texture background="true">$INFO[Window.Property(SQUEEZEINFO_NP_ICON)]</texture>
+           <texture background="false">$INFO[Window.Property(SQUEEZEINFO_NP_ICON)]</texture>
            <visible>true</visible>
          </control>
 
@@ -177,7 +176,101 @@
 
    </control>
 
-   <!-- Next track -->
+<!-- No servers -->
+   <control type="group">
+
+         <left>80</left>
+         <centertop>540</centertop>
+         <width>1760</width>
+         <height>80</height>
+         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),false)</visible>
+         <animation type="VisibleChange">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>80</height>
+           <width>100%</width>
+           <left>0</left>
+           <top>0</top>
+           <font>font02</font>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>No Servers Found.</label>
+         </control>
+
+   </control>
+
+<!-- No Squeeze players -->
+   <control type="group">
+
+         <left>80</left>
+         <centertop>540</centertop>
+         <width>1760</width>
+         <height>80</height>
+         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),false)</visible>
+         <animation type="VisibleChange">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>80</height>
+           <width>100%</width>
+           <left>0</left>
+           <top>0</top>
+           <font>font02</font>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>No Squeeze Players Found.</label>
+         </control>
+
+   </control>
+
+<!-- No playlist -->
+   <control type="group">
+
+         <left>80</left>
+         <centertop>540</centertop>
+         <width>1760</width>
+         <height>80</height>
+         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYLIST),false)</visible>
+         <animation type="VisibleChange">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>80</height>
+           <width>100%</width>
+           <left>0</left>
+           <top>0</top>
+           <font>font02</font>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>Player has no playlist</label>
+         </control>
+
+   </control>
 
    <!-- <control type="group">
 
@@ -213,68 +306,6 @@
          </control>
 
    </control> -->
-
-   <control type="group">
-
-         <left>80</left>
-         <centertop>540</centertop>
-         <width>1760</width>
-         <height>80</height>
-         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),false)</visible>
-         <animation type="VisibleChange">
-            <effect type="fade" start="0" end="100" time="500" delay="500" />
-         </animation>
-
-         <control type="image">
-           <width>100%</width>
-           <height>100%</height>
-           <texture>squeezeinfo-bg.png</texture>
-           <visible>true</visible>
-         </control>
-
-         <control type="label">
-           <height>80</height>
-           <width>100%</width>
-           <left>0</left>
-           <top>0</top>
-           <font>font02</font>
-           <align>center</align>
-           <aligny>center</aligny>
-           <label>No Servers Found.</label>
-         </control>
-
-   </control>
-
-   <control type="group">
-
-         <left>80</left>
-         <centertop>540</centertop>
-         <width>1760</width>
-         <height>80</height>
-         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),false)</visible>
-         <animation type="VisibleChange">
-            <effect type="fade" start="0" end="100" time="500" delay="500" />
-         </animation>
-
-         <control type="image">
-           <width>100%</width>
-           <height>100%</height>
-           <texture>squeezeinfo-bg.png</texture>
-           <visible>true</visible>
-         </control>
-
-         <control type="label">
-           <height>80</height>
-           <width>100%</width>
-           <left>0</left>
-           <top>0</top>
-           <font>font02</font>
-           <align>center</align>
-           <aligny>center</aligny>
-           <label>No Squeeze Players Found.</label>
-         </control>
-
-   </control>
 
 
   </controls>

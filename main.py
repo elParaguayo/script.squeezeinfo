@@ -1,3 +1,12 @@
+"""script.squeezeinfo
+
+   by elParaguayo
+
+   Basic Kodi window to display Now Playing information for your Logitech
+   Media Server.
+
+   See license.txt for licensing information.
+"""
 import xbmcaddon
 
 from resources.lib.squeezeinfo import SqueezeInfo
