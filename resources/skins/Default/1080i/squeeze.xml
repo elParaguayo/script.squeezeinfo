@@ -1,0 +1,282 @@
+<window id="1140">
+
+  <!-- <defaultcontrol>10</defaultcontrol> -->
+
+  <controls>
+
+   <!-- Background image -->
+    <control type="multiimage">
+       <width>100%</width>
+       <height>100%</height>
+       <visible>true</visible>
+       <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),false) | String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),false)" reversible="true">
+          <effect type="fade" start="0" end="100" time="500" delay="500" />
+       </animation>
+       <imagepath>$INFO[Window.Property(SQUEEZE_IMAGE_FOLDER)]</imagepath>
+       <timeperimage>5000</timeperimage>
+       <fadetime>2000</fadetime>
+       <pauseatend>1000</pauseatend>
+       <randomize>true</randomize>
+       <aspectratio>scale</aspectratio>
+    </control>
+
+   <control type="image">
+
+     <left>0</left>
+ 		 <top>0</top>
+ 		 <width>100%</width>
+ 		 <height>100%</height>
+     <visible>true</visible>
+     <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),false) | String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),false)" reversible="true">
+        <effect type="fade" start="100" end="0" time="500" delay="500" />
+     </animation>
+     <aspectratio>scale</aspectratio>
+
+     <texture>$INFO[Window.Property(SQUEEZEINFO_NP_BACKGROUND)]</texture>
+
+   </control>
+
+   <!-- <control type="button" id="10">
+     <left>200</left>
+     <top>200</top>
+     <width>100</width>
+     <height>100</height>
+     <label>FOCUS</label>
+   </control> -->
+
+   <!-- Now Playing 304e5a-->
+
+   <control type="group">
+
+         <left>80</left>
+         <top>1150</top>
+         <width>1760</width>
+         <height>150</height>
+         <visible></visible>
+         <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),true)">
+           <effect type="slide" end="0,-300" time="500" delay="500" />
+         </animation>
+
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="image">
+           <left>10</left>
+           <top>10</top>
+           <width>130</width>
+           <height>130</height>
+           <texture background="true">$INFO[Window.Property(SQUEEZEINFO_NP_ICON)]</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>150</left>
+           <top>10</top>
+           <font>font13</font>
+           <label>[COLOR ff8dddff]Now Playing:[/COLOR]</label>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>150</left>
+           <top>41</top>
+           <font>font2</font>
+           <label>$INFO[Window.Property(SQUEEZEINFO_NP_TITLE)]</label>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>150</left>
+           <top>69</top>
+           <font>font2</font>
+           <label>$INFO[Window.Property(SQUEEZEINFO_NP_ARTIST)]</label>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>150</left>
+           <top>100</top>
+           <font>font2</font>
+           <label>$INFO[Window.Property(SQUEEZEINFO_NP_ALBUM)]</label>
+         </control>
+
+         <control type="progress" id="41">
+           <left>0</left>
+           <top>148</top>
+           <width>100%</width>
+           <height>2</height>
+           <visible>true</visible>
+           <reveal>false</reveal>
+           <texturebg>transparent.png</texturebg>
+           <midtexture>prog-body.png</midtexture>
+         </control>
+
+
+         <control type="group">
+           <visible>String.IsEqual(Window.Property(SQUEEZEINFO_HAS_NEXT_TRACK),true)</visible>
+           <control type="image">
+             <left>1620</left>
+             <top>10</top>
+             <width>130</width>
+             <height>130</height>
+             <texture background="true">$INFO[Window.Property(SQUEEZEINFO_NEXT_ICON)]</texture>
+             <visible>true</visible>
+           </control>
+
+           <control type="label">
+             <height>25</height>
+             <width>720</width>
+             <left>890</left>
+             <top>10</top>
+             <font>font13</font>
+             <align>right</align>
+             <visible>true</visible>
+             <label>[COLOR ff8dddff]Next:[/COLOR]</label>
+           </control>
+
+           <control type="label">
+             <height>25</height>
+             <width>720</width>
+             <left>890</left>
+             <top>41</top>
+             <font>font2</font>
+             <align>right</align>
+             <label>$INFO[Window.Property(SQUEEZEINFO_NEXT_TITLE)]</label>
+           </control>
+
+           <control type="label">
+             <height>25</height>
+             <width>720</width>
+             <left>890</left>
+             <top>69</top>
+             <font>font2</font>
+             <align>right</align>
+             <label>$INFO[Window.Property(SQUEEZEINFO_NEXT_ARTIST)]</label>
+           </control>
+
+           <control type="label">
+             <height>25</height>
+             <width>720</width>
+             <left>890</left>
+             <top>100</top>
+             <font>font2</font>
+             <align>right</align>
+             <label>$INFO[Window.Property(SQUEEZEINFO_NEXT_ALBUM)]</label>
+           </control>
+         </control>
+
+   </control>
+
+   <!-- Next track -->
+
+   <!-- <control type="group">
+
+         <left>80</left>
+         <top>1010</top>
+         <width>1760</width>
+         <height>40</height>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>150</left>
+           <top></top>
+           <font>font02</font>
+           <label>Player: $INFO[Window.Property(SQUEEZEINFO_PLAYER_NAME)]</label>
+         </control>
+
+         <control type="label">
+           <height>25</height>
+           <width>720</width>
+           <left>890</left>
+           <top>0</top>
+           <font>font2</font>
+           <align>right</align>
+           <label>$INFO[System.Time(hh:mm)] $INFO[System.Date(DDD d MMM yyyyy)]</label>
+         </control>
+
+   </control> -->
+
+   <control type="group">
+
+         <left>80</left>
+         <centertop>540</centertop>
+         <width>1760</width>
+         <height>80</height>
+         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),false)</visible>
+         <animation type="VisibleChange">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>80</height>
+           <width>100%</width>
+           <left>0</left>
+           <top>0</top>
+           <font>font02</font>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>No Servers Found.</label>
+         </control>
+
+   </control>
+
+   <control type="group">
+
+         <left>80</left>
+         <centertop>540</centertop>
+         <width>1760</width>
+         <height>80</height>
+         <visible>String.IsEqual(Window.Property(SQUEEZEINFO_SERVER_CONNECTED),true) + String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYER),false)</visible>
+         <animation type="VisibleChange">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+
+         <control type="image">
+           <width>100%</width>
+           <height>100%</height>
+           <texture>squeezeinfo-bg.png</texture>
+           <visible>true</visible>
+         </control>
+
+         <control type="label">
+           <height>80</height>
+           <width>100%</width>
+           <left>0</left>
+           <top>0</top>
+           <font>font02</font>
+           <align>center</align>
+           <aligny>center</aligny>
+           <label>No Squeeze Players Found.</label>
+         </control>
+
+   </control>
+
+
+  </controls>
+
+</window>
