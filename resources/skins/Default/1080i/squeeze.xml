@@ -361,7 +361,6 @@
                            <height>31</height>
                            <font>font13</font>
                            <aligny>center</aligny>
-                           <selectedcolor>green</selectedcolor>
                            <align>left</align>
                            <info>ListItem.Artist</info>
                    </control>
@@ -372,8 +371,6 @@
                            <height>35</height>
                            <font>font13</font>
                            <aligny>center</aligny>
-                           <selectedcolor>green</selectedcolor>
-                           <textcolor>grey</textcolor>
                            <align>left</align>
                            <info>ListItem.Album</info>
                    </control>
@@ -411,7 +408,6 @@
                    <height>31</height>
                    <font>font13</font>
                    <aligny>center</aligny>
-                   <selectedcolor>green</selectedcolor>
                    <align>left</align>
                    <info>ListItem.Artist</info>
            </control>
@@ -422,8 +418,6 @@
                    <height>35</height>
                    <font>font13</font>
                    <aligny>center</aligny>
-                   <selectedcolor>green</selectedcolor>
-                   <textcolor>grey</textcolor>
                    <align>left</align>
                    <info>ListItem.Album</info>
            </control>
