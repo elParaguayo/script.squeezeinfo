@@ -22,12 +22,16 @@ _A_ = xbmcaddon.Addon()
 
 # Get the userdata folder path
 ADDON_PROFILE = xbmc.translatePath(_A_.getAddonInfo('profile')).decode('utf-8')
+SPECIAL_PROFILE = _A_.getAddonInfo('profile')
+
+BLUR_SIZE = int(_A_.getSetting("blur_size"))
 
 # Define the cache path
 CACHE_PATH = os.path.join(ADDON_PROFILE, "cache")
 CACHE_LOCATIONS = {IMG_BACKGROUND: IMG_BACKGROUND,
                    IMG_ICON: IMG_ICON,
                    IMG_PROGRESS: IMG_PROGRESS}
+SPECIAL_CACHE = os.path.join(SPECIAL_PROFILE, "cache")
 
 
 class ImageCache(object):
@@ -81,7 +85,8 @@ class ImageCache(object):
         img = Image.open(StringIO(raw.content))
 
         # The icon file is just the unprocessed image
-        img.save(icon_path)
+        tmp = img.copy()
+        tmp.save(icon_path)
 
         # Process the background image...
 
@@ -89,7 +94,7 @@ class ImageCache(object):
         bg = img.resize((1920, 1920))
 
         # 2) Apply blur to hide pixellation
-        bg= bg.filter(ImageFilter.GaussianBlur(radius=40))
+        bg= bg.filter(ImageFilter.GaussianBlur(radius=BLUR_SIZE))
 
         # 4) Create a semi-transparent black layer
         lyr = Image.new('RGBA', (1920, 1920))
@@ -126,4 +131,4 @@ class ImageCache(object):
         if not os.path.exists(cached_file):
             self.save_images(url, img_name)
 
-        return cached_file
+        return os.path.join(SPECIAL_CACHE, subfolder, img_name)

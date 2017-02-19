@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-		<setting id="server_ip" label="32000" type="ipaddress" default="127.0.0.1" />
-    <setting id="telnet_port" label="32001" type="number" default="9090" />
-		<setting id="web_port" label="32002" type="number" default="9000" />
+	  <category label="32100">
+			<setting id="server_ip" label="32000" type="ipaddress" default="127.0.0.1" />
+	    <setting id="telnet_port" label="32001" type="number" default="9090" />
+			<setting id="web_port" label="32002" type="number" default="9000" />
+		</category>
+		<category label="32101">
+			<setting id="blur_size" label="32050" type="slider" range="5,5,50" option="int" default="25" />
+			<setting label="32051" type="action" action="RunScript(script.squeezeinfo, clearcache)" />
+		</category>
 </settings>

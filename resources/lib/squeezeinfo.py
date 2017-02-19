@@ -315,8 +315,11 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # Despite the name this image cache also handles the image processing.
         try:
             debug("Getting cached image paths.")
-            img_icon = self.cache.getCachedImage(url, IMG_ICON)
             img_bg = self.cache.getCachedImage(url, IMG_BACKGROUND)
+
+            # For some reason, the cache isn't loading for the icon so we'll use
+            # the url for now...
+            # img_icon = self.cache.getCachedImage(url, IMG_ICON)
         except:
             debug("Error retrieving cache paths")
 

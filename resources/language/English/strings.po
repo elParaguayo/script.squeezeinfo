@@ -29,3 +29,19 @@ msgstr ""
 msgctxt "#32002"
 msgid "Web port (default 9000)"
 msgstr ""
+
+msgctxt "#32050"
+msgid "Background image blur amount"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Clear image cache"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Server"
+msgstr ""
+
+msgctxt "#32101"
+msgid "Images"
+msgstr ""
