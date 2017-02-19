@@ -71,8 +71,9 @@ class ImageCache(object):
     def save_images(self, url, img_name):
         """Processes the images and saves them to the cache locations."""
         bg_path = os.path.join(CACHE_PATH, IMG_BACKGROUND, img_name)
-        icon_path = os.path.join(CACHE_PATH, IMG_ICON,
-                                 "icon_{}".format(img_name))
+        # icon_path = os.path.join(CACHE_PATH, IMG_ICON,
+        #                          "icon_{}".format(img_name))
+        icon_path = os.path.join(CACHE_PATH, IMG_ICON, img_name)
         swatch_path = os.path.join(CACHE_PATH, IMG_PROGRESS, img_name)
 
         # Get the image from the URL
@@ -117,10 +118,10 @@ class ImageCache(object):
         img_hash = hashlib.md5(url).hexdigest()
         img_name = "{}.jpg".format(img_hash)
 
-        if img_type == IMG_ICON:
-            cached_file = os.path.join(folder, "icon_{}".format(img_name))
-        else:
-            cached_file = os.path.join(folder, img_name)
+        # if img_type == IMG_ICON:
+        #     cached_file = os.path.join(folder, "icon_{}".format(img_name))
+        # else:
+        cached_file = os.path.join(folder, img_name)
 
         if not os.path.exists(cached_file):
             self.save_images(url, img_name)

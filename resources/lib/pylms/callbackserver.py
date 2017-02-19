@@ -166,3 +166,6 @@ class CallbackServer(Server, Thread):
             except EOFError:
                 self.check_event(CallbackServer.SERVER_ERROR)
                 self.run()
+
+        self.telnet.close()
+        del self.telnet

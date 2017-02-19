@@ -68,6 +68,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.elapsed = 0
         self.playing = False
         self.connected = False
+        self.abort = False
 
         # Set the location of the server
         self.hostname = LMS_SERVER
@@ -331,6 +332,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZEINFO_NP_ALBUM", album)
         self.setProperty("SQUEEZEINFO_NP_BACKGROUND", bg)
         self.setProperty("SQUEEZEINFO_NP_ICON", icon)
+        debug(icon, level=xbmc.LOGNOTICE)
 
     def set_next_up(self, track):
         """Method to set window properties for the next track."""
@@ -437,7 +439,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         i = 0
 
         # start a loop which stops when Kodi exits
-        while not xbmc.abortRequested:
+        while not (xbmc.abortRequested or self.abort):
 
             # Every 20 cycles we make request to the server to check..
             if not (i % 20):
@@ -480,6 +482,13 @@ class SqueezeInfo(xbmcgui.WindowXML):
     @ch.action("parentdir", "*")
     @ch.action("previousmenu", "*")
     def exit(self, controlid):
+        self.cbserver.abort = True
+        self.abort = True
+        del self.cbserver
+        del self.cmdserver
+        del self.awr
+        del self.cache
+        del self.player
         self.close()
 
     @ch.action("volumeup", "*")
