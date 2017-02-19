@@ -160,6 +160,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
         debug("OnInit - starting callback server")
         self.cbserver.start()
 
+        self.set_playlist()
+
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
         ch.serve_action(action, self.getFocusId(), self)
@@ -498,3 +500,15 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def test_act(self, controlid):
         debug("VOLUME UP!")
         self.vol_up()
+
+    def set_playlist(self):
+        listbox = self.getControl(50)
+
+        pl_items = self.player.playlist_get_current_detail(amount=5)
+
+        for plitm in pl_items:
+            item = xbmcgui.ListItem()
+            title, _, artist, icon, _ = self.get_metadata(plitm)
+            item.setInfo("music", {"Album": title, "Artist": artist})
+            item.setIconImage(icon)
+            listbox.addItem(item)
