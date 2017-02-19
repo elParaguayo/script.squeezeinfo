@@ -291,7 +291,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         if track:
             self.setProperty("SQUEEZEINFO_HAS_PLAYLIST", "true")
 
-    def get_metadata(self, track):
+    def get_metadata(self, track, process_image=True):
         """Method to output the track metadata."""
         title = track.get("title", "Unknown Track")
         album = track.get("album", "Unknown Album")
@@ -314,16 +314,18 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
         debug("Artwork url: {}".format(url))
 
-        # Despite the name this image cache also handles the image processing.
-        try:
-            debug("Getting cached image paths.")
-            img_bg = self.cache.getCachedImage(url, IMG_BACKGROUND)
+        if process_image:
 
-            # For some reason, the cache isn't loading for the icon so we'll use
-            # the url for now...
-            # img_icon = self.cache.getCachedImage(url, IMG_ICON)
-        except:
-            debug("Error retrieving cache paths")
+            # Despite the name this image cache also handles the image processing.
+            try:
+                debug("Getting cached image paths.")
+                img_bg = self.cache.getCachedImage(url, IMG_BACKGROUND)
+
+                # For some reason, the cache isn't loading for the icon so we'll
+                # use the url for now...
+                # img_icon = self.cache.getCachedImage(url, IMG_ICON)
+            except:
+                debug("Error retrieving cache paths")
 
         # Return the necessary metadata
         return title, album, artist, img_icon, img_bg
@@ -508,7 +510,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
         for plitm in pl_items:
             item = xbmcgui.ListItem()
-            title, _, artist, icon, _ = self.get_metadata(plitm)
+            title, _, artist, icon, _ = self.get_metadata(plitm,
+                                                          process_image=False)
             item.setInfo("music", {"Album": title, "Artist": artist})
             item.setIconImage(icon)
             listbox.addItem(item)
