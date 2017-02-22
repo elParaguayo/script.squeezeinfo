@@ -1,8 +1,17 @@
 <window id="1140">
 
-  <defaultcontrol>50</defaultcontrol>
+  <!-- <defaultcontrol>10</defaultcontrol> -->
 
   <controls>
+
+    <!-- <control type="button" id="10">
+      <left>2000</left>
+      <width>100%</width>
+      <height>100%</height>
+      <visible>true</visible>
+      <onclick></onclick>
+      <onup>50</onup>
+    </control> -->
 
    <!-- Background image -->
     <control type="multiimage">
@@ -318,68 +327,77 @@
 
    <control type="list" id="50">
          <description>Playlist container</description>
-         <left>80</left>
+         <left>520</left>
          <top>60</top>
-         <width>400</width>
-         <height>500</height>
-         <visible>true</visible>
+         <width>850</width>
+         <height>460</height>
+         <!-- <visible>String.IsEqual(Window.Property("SQUEEZEINFO_SHOW_PLAYLIST"),true)</visible> -->
+         <visible>false</visible>
          <viewtype>list</viewtype>
          <orientation>vertical</orientation>
          <pagecontrol>25</pagecontrol>
          <autoscroll>false</autoscroll>
+         <onup>50</onup>
+         <ondown>50</ondown>
          <scrolltime tween="sine" easing="out">400</scrolltime>
-         <itemlayout width="400" height="80">
-                   <control type="image">
-                           <left>0</left>
-                           <top>0</top>
-                           <width>400</width>
-                           <height>75</height>
-                           <texture>squeezeinfo-bg.png</texture>
-                   </control>
-
-                   <control type="label">
-                           <left>0</left>
-                           <top>0</top>
-                           <width>10</width>
-                           <height>74</height>
-                           <font>font13</font>
-                           <aligny>center</aligny>
-                           <align>center</align>
-                           <info>ListItem.TrackNumber</info>
-                   </control>
-                   <control type="image">
-                           <left>12</left>
-                           <top>2</top>
-                           <width>70</width>
-                           <height>70</height>
-                           <info>ListItem.Icon</info>
-                   </control>
-                   <control type="label">
-                           <left>100</left>
-                           <top>2</top>
-                           <width>300</width>
-                           <height>31</height>
-                           <font>font13</font>
-                           <aligny>center</aligny>
-                           <align>left</align>
-                           <info>ListItem.Artist</info>
-                   </control>
-                   <control type="label">
-                           <left>100</left>
-                           <top>35</top>
-                           <width>300</width>
-                           <height>35</height>
-                           <font>font13</font>
-                           <aligny>center</aligny>
-                           <align>left</align>
-                           <info>ListItem.Album</info>
-                   </control>
-         </itemlayout>
-         <focusedlayout height="80" width="800">
+         <animation type="Visible">
+            <effect type="fade" start="0" end="100" time="500" delay="500" />
+         </animation>
+         <animation type="Hidden">
+            <effect type="fade" start="100" end="0" time="500" delay="0" />
+         </animation>
+         <itemlayout width="850" height="77">
            <control type="image">
                    <left>0</left>
                    <top>0</top>
-                   <width>400</width>
+                   <width>850</width>
+                   <height>75</height>
+                   <texture>squeezeinfo-bg.png</texture>
+           </control>
+
+           <control type="label">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>75</width>
+                   <height>80</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>center</align>
+                   <info>ListItem.TrackNumber</info>
+           </control>
+           <control type="image">
+                   <left>77</left>
+                   <top>2</top>
+                   <width>70</width>
+                   <height>70</height>
+                   <info>ListItem.Icon</info>
+           </control>
+           <control type="label">
+                   <left>170</left>
+                   <top>2</top>
+                   <width>680</width>
+                   <height>31</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <info>ListItem.Title</info>
+           </control>
+           <control type="label">
+                   <left>170</left>
+                   <top>35</top>
+                   <width>680</width>
+                   <height>35</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <info>ListItem.Artist</info>
+           </control>
+         </itemlayout>
+         <focusedlayout height="77" width="850">
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>850</width>
                    <height>75</height>
                    <texture>squeezeinfo-highlight.png</texture>
            </control>
@@ -387,41 +405,41 @@
            <control type="label">
                    <left>0</left>
                    <top>0</top>
-                   <width>10</width>
-                   <height>74</height>
+                   <width>75</width>
+                   <height>80</height>
                    <font>font13</font>
                    <aligny>center</aligny>
                    <align>center</align>
                    <info>ListItem.TrackNumber</info>
            </control>
            <control type="image">
-                   <left>12</left>
+                   <left>77</left>
                    <top>2</top>
                    <width>70</width>
                    <height>70</height>
                    <info>ListItem.Icon</info>
            </control>
            <control type="label">
-                   <left>100</left>
+                   <left>170</left>
                    <top>2</top>
-                   <width>300</width>
+                   <width>680</width>
                    <height>31</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <info>ListItem.Title</info>
+           </control>
+           <control type="label">
+                   <left>170</left>
+                   <top>35</top>
+                   <width>680</width>
+                   <height>35</height>
                    <font>font13</font>
                    <aligny>center</aligny>
                    <align>left</align>
                    <info>ListItem.Artist</info>
            </control>
-           <control type="label">
-                   <left>100</left>
-                   <top>35</top>
-                   <width>300</width>
-                   <height>35</height>
-                   <font>font13</font>
-                   <aligny>center</aligny>
-                   <align>left</align>
-                   <info>ListItem.Album</info>
-           </control>
-      </focusedlayout>
+               </focusedlayout>
    </control>
 
 

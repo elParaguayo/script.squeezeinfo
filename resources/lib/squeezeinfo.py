@@ -69,6 +69,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.playing = False
         self.connected = False
         self.abort = False
+        self.show_playlist = False
 
         # Set the location of the server
         self.hostname = LMS_SERVER
@@ -119,6 +120,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZE_IMAGE_FOLDER",
                          os.path.join(CACHE_PATH, IMG_ICON))
 
+        listbox = self.getControl(50)
+        listbox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_PLAYLIST),true)")
+
         # Let's see if the server is working
         debug("OnInit - Getting server")
         self.get_server()
@@ -160,7 +164,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         debug("OnInit - starting callback server")
         self.cbserver.start()
 
-        self.set_playlist()
+        #self.set_playlist()
 
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
@@ -506,12 +510,35 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def set_playlist(self):
         listbox = self.getControl(50)
 
-        pl_items = self.player.playlist_get_current_detail(amount=5)
+        pl_items = self.player.playlist_get_detail()
 
-        for plitm in pl_items:
+        for i, plitm in enumerate(pl_items):
             item = xbmcgui.ListItem()
             title, _, artist, icon, _ = self.get_metadata(plitm,
                                                           process_image=False)
-            item.setInfo("music", {"Album": title, "Artist": artist})
+            item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
             item.setIconImage(icon)
             listbox.addItem(item)
+
+        pos = self.player.playlist_get_position()
+        listbox.selectItem(pos)
+
+    @ch.action("select", 50)
+    def click_playlist(self, controlid):
+        listbox = self.getControl(controlid)
+        index = listbox.getSelectedPosition()
+        self.player.playlist_play_index(index)
+
+    @ch.action("number0", "*")
+    def toggle_playlist(self, controlid):
+        if self.show_playlist:
+            self.show_playlist = False
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "false")
+        else:
+            self.set_playlist()
+            self.show_playlist = True
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
+            listbox = self.getControl(50)
+            debug("Listbox control: {}".format(listbox), level=xbmc.LOGNOTICE)
+            sleep(0.6)
+            self.setFocus(listbox)
