@@ -338,11 +338,13 @@ class SqueezeInfo(xbmcgui.WindowXML):
         """Method to set window properties for the current track."""
         debug("Setting now playing track info")
         title, album, artist, icon, bg = self.get_metadata(track)
+        pos = track.get("playlist index", -1)
         self.setProperty("SQUEEZEINFO_NP_TITLE", title)
         self.setProperty("SQUEEZEINFO_NP_ARTIST", artist)
         self.setProperty("SQUEEZEINFO_NP_ALBUM", album)
         self.setProperty("SQUEEZEINFO_NP_BACKGROUND", bg)
         self.setProperty("SQUEEZEINFO_NP_ICON", icon)
+        self.setProperty("SQUEEZEINFO_CURRENT_TRACK", str(pos + 1))
         debug(icon, level=xbmc.LOGNOTICE)
 
     def set_next_up(self, track):
