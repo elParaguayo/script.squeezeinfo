@@ -69,6 +69,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.playing = False
         self.connected = False
         self.abort = False
+        self.show_playlist = False
 
         # Set the location of the server
         self.hostname = LMS_SERVER
@@ -119,6 +120,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZE_IMAGE_FOLDER",
                          os.path.join(CACHE_PATH, IMG_ICON))
 
+        listbox = self.getControl(50)
+        listbox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_PLAYLIST),true)")
+
         # Let's see if the server is working
         debug("OnInit - Getting server")
         self.get_server()
@@ -159,6 +163,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # Start the callback server to listen for events
         debug("OnInit - starting callback server")
         self.cbserver.start()
+
+        #self.set_playlist()
 
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
@@ -289,7 +295,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         if track:
             self.setProperty("SQUEEZEINFO_HAS_PLAYLIST", "true")
 
-    def get_metadata(self, track):
+    def get_metadata(self, track, process_image=True):
         """Method to output the track metadata."""
         title = track.get("title", "Unknown Track")
         album = track.get("album", "Unknown Album")
@@ -312,16 +318,18 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
         debug("Artwork url: {}".format(url))
 
-        # Despite the name this image cache also handles the image processing.
-        try:
-            debug("Getting cached image paths.")
-            img_bg = self.cache.getCachedImage(url, IMG_BACKGROUND)
+        if process_image:
 
-            # For some reason, the cache isn't loading for the icon so we'll use
-            # the url for now...
-            # img_icon = self.cache.getCachedImage(url, IMG_ICON)
-        except:
-            debug("Error retrieving cache paths")
+            # Despite the name this image cache also handles the image processing.
+            try:
+                debug("Getting cached image paths.")
+                img_bg = self.cache.getCachedImage(url, IMG_BACKGROUND)
+
+                # For some reason, the cache isn't loading for the icon so we'll
+                # use the url for now...
+                # img_icon = self.cache.getCachedImage(url, IMG_ICON)
+            except:
+                debug("Error retrieving cache paths")
 
         # Return the necessary metadata
         return title, album, artist, img_icon, img_bg
@@ -330,11 +338,13 @@ class SqueezeInfo(xbmcgui.WindowXML):
         """Method to set window properties for the current track."""
         debug("Setting now playing track info")
         title, album, artist, icon, bg = self.get_metadata(track)
+        pos = track.get("playlist index", -1)
         self.setProperty("SQUEEZEINFO_NP_TITLE", title)
         self.setProperty("SQUEEZEINFO_NP_ARTIST", artist)
         self.setProperty("SQUEEZEINFO_NP_ALBUM", album)
         self.setProperty("SQUEEZEINFO_NP_BACKGROUND", bg)
         self.setProperty("SQUEEZEINFO_NP_ICON", icon)
+        self.setProperty("SQUEEZEINFO_CURRENT_TRACK", str(pos + 1))
         debug(icon, level=xbmc.LOGNOTICE)
 
     def set_next_up(self, track):
@@ -498,3 +508,39 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def test_act(self, controlid):
         debug("VOLUME UP!")
         self.vol_up()
+
+    def set_playlist(self):
+        listbox = self.getControl(50)
+
+        pl_items = self.player.playlist_get_detail()
+
+        for i, plitm in enumerate(pl_items):
+            item = xbmcgui.ListItem()
+            title, _, artist, icon, _ = self.get_metadata(plitm,
+                                                          process_image=False)
+            item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
+            item.setIconImage(icon)
+            listbox.addItem(item)
+
+        pos = self.player.playlist_get_position()
+        listbox.selectItem(pos)
+
+    @ch.action("select", 50)
+    def click_playlist(self, controlid):
+        listbox = self.getControl(controlid)
+        index = listbox.getSelectedPosition()
+        self.player.playlist_play_index(index)
+
+    @ch.action("number0", "*")
+    def toggle_playlist(self, controlid):
+        if self.show_playlist:
+            self.show_playlist = False
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "false")
+        else:
+            self.set_playlist()
+            self.show_playlist = True
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
+            listbox = self.getControl(50)
+            debug("Listbox control: {}".format(listbox), level=xbmc.LOGNOTICE)
+            sleep(0.6)
+            self.setFocus(listbox)

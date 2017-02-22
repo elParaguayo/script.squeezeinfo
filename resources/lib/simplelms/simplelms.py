@@ -102,6 +102,11 @@ class LMSPlayer(object):
         except:
             return 0
 
+    def playlist_play_index(self, index):
+        """Play track at a certain position in the current playlist
+        (index is zero-based)"""
+        return self.request('playlist index {}'.format(index))
+
     def playlist_get_position(self):
         """Get the position of the current track in the playlist"""
         try:
