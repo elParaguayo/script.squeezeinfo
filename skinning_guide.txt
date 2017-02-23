@@ -1,0 +1,46 @@
+Custom skins can be created for this script. To help skinners, this file sets out the various window properties and control IDs that are available.
+
+Window properties
+-----------------
+
+1) Current track
+SQUEEZEINFO_NP_TITLE          Now playing title
+SQUEEZEINFO_NP_ARTIST         Now playing artist
+SQUEEZEINFO_NP_ALBUM          Now playing album
+SQUEEZEINFO_NP_ICON           Filepath to unprocessed album art for current track
+SQUEEZEINFO_NP_BACKGROUND     Filepath to processed album art
+SQUEEZEINFO_CURRENT_TRACK     Now playing track playlist position
+
+2) Next track
+SQUEEZEINFO_NEXT_TITLE        Next track title
+SQUEEZEINFO_NEXT_ARTIST       Next track artist
+SQUEEZEINFO_NEXT_ALBUM        Next track album
+SQUEEZEINFO_NEXT_ICON         Filepath to unprocessed album art for current track
+
+3) Player
+[TBC]
+
+4) Miscellaneous
+SQUEEZE_IMAGE_FOLDER          Path to unprocessed album art
+
+5) Booleans (NB these are strings "true" and "false")
+SQUEEZEINFO_SERVER_CONNECTED  Whether LMS server is online
+SQUEEZEINFO_HAS_PLAYER        Whether a squeezeplayer is available
+SQUEEZEINFO_HAS_PLAYLIST      Whether current player has at least one track in the playlist
+SQUEEZEINFO_HAS_NEXT_TRACK    Whether there is more than one track in the playlist
+SQUEEZEINFO_SHOW_PLAYLIST     Whether playlist should be displayed
+
+
+Controls
+--------
+
+1) Playist
+List control.
+ID 50
+Available listitem meytadata:
+-Title
+-Artist
+-Album
+-TrackNumber
+
+Control should be hidden by default. Visibility is toggled by a Window property. Conditional visibility is handled by the script and not the skin file.

@@ -32,6 +32,9 @@ IMG_BACKGROUND = "backgrounds"
 IMG_ICON = "icons"
 IMG_PROGRESS = "swatch"
 
+CONTROL_PLAYLIST = 50
+SKIN_CONTROLS = [CONTROL_PLAYLIST]
+
 # Initialise the action handler
 ch = ActionHandler()
 
@@ -345,7 +348,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZEINFO_NP_BACKGROUND", bg)
         self.setProperty("SQUEEZEINFO_NP_ICON", icon)
         self.setProperty("SQUEEZEINFO_CURRENT_TRACK", str(pos + 1))
-        debug(icon, level=xbmc.LOGNOTICE)
 
     def set_next_up(self, track):
         """Method to set window properties for the next track."""
@@ -428,6 +430,20 @@ class SqueezeInfo(xbmcgui.WindowXML):
         """Method to trigger actions when volume changes."""
         pass
 
+    def change_player(self, step):
+        self.setProperty("SQUEEZEINFO_CHANGE_PLAYER", "false")
+        sleep(0.05)
+        debug("Changing player. Index step {}".format(step))
+        index = self.players.index(self.cur_player)
+        index = (index + step) % len(self.players)
+        self.player = self.players[index]
+        self.cur_player = str(self.player.ref)
+        debug("New player: {}".format(self.player.name))
+        debug("Updating screen...")
+        self.setProperty("SQUEEZEINFO_PLAYER_NAME", self.player.name)
+        self.setProperty("SQUEEZEINFO_CHANGE_PLAYER", "true")
+        self.get_info()
+
     def vol_up(self):
         """Method to increase current player's volume."""
         try:
@@ -441,6 +457,22 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.player.volume_down()
         except:
             pass
+
+    def set_playlist(self):
+        listbox = self.getControl(CONTROL_PLAYLIST)
+
+        pl_items = self.player.playlist_get_detail()
+
+        for i, plitm in enumerate(pl_items):
+            item = xbmcgui.ListItem()
+            title, _, artist, icon, _ = self.get_metadata(plitm,
+                                                          process_image=False)
+            item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
+            item.setIconImage(icon)
+            listbox.addItem(item)
+
+        pos = self.player.playlist_get_position()
+        listbox.selectItem(pos)
 
     def show_progress(self):
         """Method to increase progress bar state. Should be run as a thread to
@@ -492,11 +524,16 @@ class SqueezeInfo(xbmcgui.WindowXML):
             # And sleep...
             sleep(0.25)
 
+        if not self.abort:
+            self.exit("*")
+
     @ch.action("parentdir", "*")
     @ch.action("previousmenu", "*")
     def exit(self, controlid):
         self.cbserver.abort = True
-        self.abort = True
+        self.cbserver.join()
+        if not self.abort:
+            self.abort = True
         del self.cbserver
         del self.cmdserver
         del self.awr
@@ -504,28 +541,17 @@ class SqueezeInfo(xbmcgui.WindowXML):
         del self.player
         self.close()
 
-    @ch.action("volumeup", "*")
-    def test_act(self, controlid):
-        debug("VOLUME UP!")
-        self.vol_up()
+    @ch.action("left", "*")
+    def on_left(self, controlid):
+        if controlid not in SKIN_CONTROLS:
+            self.change_player(-1)
 
-    def set_playlist(self):
-        listbox = self.getControl(50)
+    @ch.action("right", "*")
+    def on_right(self, controlid):
+        if controlid not in SKIN_CONTROLS:
+            self.change_player(1)
 
-        pl_items = self.player.playlist_get_detail()
-
-        for i, plitm in enumerate(pl_items):
-            item = xbmcgui.ListItem()
-            title, _, artist, icon, _ = self.get_metadata(plitm,
-                                                          process_image=False)
-            item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
-            item.setIconImage(icon)
-            listbox.addItem(item)
-
-        pos = self.player.playlist_get_position()
-        listbox.selectItem(pos)
-
-    @ch.action("select", 50)
+    @ch.action("select", CONTROL_PLAYLIST)
     def click_playlist(self, controlid):
         listbox = self.getControl(controlid)
         index = listbox.getSelectedPosition()
@@ -541,6 +567,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.show_playlist = True
             self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
             listbox = self.getControl(50)
-            debug("Listbox control: {}".format(listbox), level=xbmc.LOGNOTICE)
+            debug("Listbox control: {}".format(listbox))
             sleep(0.6)
             self.setFocus(listbox)

@@ -290,6 +290,38 @@
 
    </control>
 
+   <!-- Player name -->
+      <control type="group">
+
+            <left>80</left>
+            <centertop>540</centertop>
+            <width>1760</width>
+            <height>80</height>
+            <visible>String.IsEqual(Window.Property(SQUEEZEINFO_CHANGE_PLAYER),true)</visible>
+            <animation type="Visible">
+               <effect type="fade" start="100" end="0" time="3000" delay="0" tween="quadratic" easing="in"/>
+            </animation>
+
+            <control type="image">
+              <width>100%</width>
+              <height>100%</height>
+              <texture>squeezeinfo-bg.png</texture>
+              <visible>true</visible>
+            </control>
+
+            <control type="label">
+              <height>80</height>
+              <width>100%</width>
+              <left>0</left>
+              <top>0</top>
+              <font>font02</font>
+              <align>center</align>
+              <aligny>center</aligny>
+              <label>$INFO[Window.Property(SQUEEZEINFO_PLAYER_NAME)]</label>
+            </control>
+
+      </control>
+
    <!-- <control type="group">
 
          <left>80</left>
