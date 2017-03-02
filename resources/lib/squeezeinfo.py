@@ -2,14 +2,18 @@
 import os
 from threading import Thread, Lock
 from time import sleep
+from urllib import quote_plus
 
 import xbmc, xbmcgui, xbmcaddon
 from kodi65.actionhandler import ActionHandler
 
+from .customhomemenu import CUSTOM_MENU
 from .image_cache import ImageCache
 from .pylms.callbackserver import CallbackServer
 from .simplelms.artworkresolver import ArtworkResolver
 from .simplelms.simplelms import LMSServer
+from .simplelms.menu import LMSMenuHandler
+from .simplelms.menuitems import menu_type as lms_menu_type
 
 # Debugging level
 DEBUG_LEVEL = xbmc.LOGDEBUG
@@ -32,8 +36,24 @@ IMG_BACKGROUND = "backgrounds"
 IMG_ICON = "icons"
 IMG_PROGRESS = "swatch"
 
+CONTROL_DEFAULT = 10
 CONTROL_PLAYLIST = 50
-SKIN_CONTROLS = [CONTROL_PLAYLIST]
+CONTROL_MENU_GROUP = 100
+CONTROL_MENU = 101
+CONTROL_MENU_PLAY = 414141
+CONTROL_AUDIO_SUBMENU = 410100
+CONTROL_SEARCH_SUBMENU = 410101
+SKIN_CONTROLS = [CONTROL_PLAYLIST, CONTROL_MENU, CONTROL_MENU_GROUP, CONTROL_MENU_PLAY, 1011, 1012, 1013]
+
+SUBMENU_AUDIO_TYPES = ["audio", "playlist"]
+SUBMENU_SEARCH_TYPES = ["search"]
+SUBMENUS = {CONTROL_AUDIO_SUBMENU:
+               [("Play", "play"),
+                ("Play Next", "playnext"),
+                ("Queue", "add")],
+            CONTROL_SEARCH_SUBMENU:
+                [("Search", "search")]
+            }
 
 # Initialise the action handler
 ch = ActionHandler()
@@ -73,6 +93,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.connected = False
         self.abort = False
         self.show_playlist = False
+        self.show_menu = False
+        self.menu_history = []
+
 
         # Set the location of the server
         self.hostname = LMS_SERVER
@@ -123,8 +146,16 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZE_IMAGE_FOLDER",
                          os.path.join(CACHE_PATH, IMG_ICON))
 
-        listbox = self.getControl(50)
-        listbox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_PLAYLIST),true)")
+        self.playlistbox = self.getControl(CONTROL_PLAYLIST)
+        self.playlistbox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_PLAYLIST),true)")
+
+        self.menubox = self.getControl(CONTROL_MENU_GROUP)
+        self.menubox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_MENU),true)")
+
+        self.audiosubmenu = self.getControl(CONTROL_AUDIO_SUBMENU)
+        self.searchsubmenu = self.getControl(CONTROL_SEARCH_SUBMENU)
+        self.build_submenus()
+        # self.submenubox.setVisibleCondition("String.IsEqual(Container(101).ListItem(0).Property(showsubmenu),true)")
 
         # Let's see if the server is working
         debug("OnInit - Getting server")
@@ -188,6 +219,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
         """Simple method for clearing window properties."""
         debug("Clearing property {}".format(propname))
         xbmcgui.Window(self.windowID).clearProperty(propname)
+
+    def set_default_focus(self):
+        self.setFocusId(CONTROL_DEFAULT)
 
     def get_server(self):
         """Method to check whether Logitech Media Server is online.
@@ -458,6 +492,93 @@ class SqueezeInfo(xbmcgui.WindowXML):
         except:
             pass
 
+    def get_text(self, heading):
+        text = xbmcgui.Dialog().input(heading, type=xbmcgui.INPUT_ALPHANUM)
+        return text
+
+    def display_playlist(self, hide=False):
+        if hide:
+            self.show_playlist = False
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "false")
+            self.set_default_focus()
+        else:
+            self.set_playlist()
+            self.show_playlist = True
+            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
+            listbox = self.getControl(50)
+            debug("Listbox control: {}".format(listbox))
+            sleep(0.6)
+            self.setFocus(listbox)
+
+    def display_menu(self, hide=False):
+        if hide:
+            self.show_menu = False
+            current_item = self.getControl(CONTROL_MENU).getSelectedItem()
+            current_item.setProperty("showaudiosubmenu", "false")
+            current_item.setProperty("showsearchsubmenu", "false")
+            self.setProperty("SQUEEZEINFO_SHOW_MENU", "false")
+            self.setFocusId(CONTROL_DEFAULT)
+        else:
+            self.set_menu()
+            self.show_menu = True
+            self.setProperty("SQUEEZEINFO_SHOW_MENU", "true")
+            sleep(0.6)
+            self.setFocusId(CONTROL_MENU)
+
+    def menu_back(self):
+        menucmd = None
+
+        if len(self.menu_history) > 1:
+            self.menu_history.pop()
+            menucmd = self.menu_history.pop()
+        else:
+            self.menu_history = []
+
+        self.set_menu(menucmd)
+        sleep(0.1)
+        self.setFocusId(CONTROL_MENU)
+
+    def menu_action(self):
+        menu = self.getControl(CONTROL_MENU)
+        item = menu.getSelectedItem()
+        if item.getProperty("Type") in ["menu", "playlist"]:
+            self.set_menu(item.getProperty("cmd"))
+            sleep(0.1)
+            self.setFocusId(CONTROL_MENU)
+
+    def submenu_action(self, controlid):
+        menu = self.getControl(CONTROL_MENU)
+        menuitem = menu.getSelectedItem()
+
+        submenu = self.getControl(controlid)
+        item = submenu.getSelectedItem()
+        action = item.getProperty("action")
+
+        if controlid == CONTROL_AUDIO_SUBMENU:
+            cmd = menuitem.getProperty(action)
+            self.player.request(cmd)
+
+        elif controlid == CONTROL_SEARCH_SUBMENU:
+            text = self.get_text("Enter search terms...")
+            if text:
+                text = quote_plus(text)
+                cmd = menuitem.getProperty("search")
+                debug("COMMAND: {}".format(cmd), level=xbmc.LOGNOTICE)
+                cmd = cmd.replace("__TAGGEDINPUT__", text)
+                debug("COMMAND_REPLACE: {}".format(cmd), level=xbmc.LOGNOTICE)
+                self.set_menu(menucmd=cmd)
+                sleep(0.1)
+                self.setFocusId(CONTROL_MENU)
+
+    def display_submenu(self):
+        menu = self.getControl(CONTROL_MENU)
+        item = menu.getSelectedItem()
+        it_type = item.getProperty("Type")
+        if it_type in ["audio", "playlist"]:
+            self.setFocusId(CONTROL_AUDIO_SUBMENU)
+        elif it_type in ["search"]:
+            self.setFocusId(CONTROL_SEARCH_SUBMENU)
+
     def set_playlist(self):
         listbox = self.getControl(CONTROL_PLAYLIST)
 
@@ -473,6 +594,105 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
         pos = self.player.playlist_get_position()
         listbox.selectItem(pos)
+
+    def set_menu(self, menucmd=None):
+        handle = LMSMenuHandler(self.player)
+        menubox = self.getControl(CONTROL_MENU)
+
+        if not menucmd:
+            menu = handle.getCustomMenu(CUSTOM_MENU)
+        else:
+            self.menu_history.append(menucmd)
+            menu = handle.getMenu(menucmd=menucmd)
+
+        menubox.reset()
+
+        for item in menu:
+            l_item = xbmcgui.ListItem()
+            m_type = lms_menu_type(item)
+            play = getattr(item, "cmd_play", "")
+            playnext = getattr(item, "cmd_play_next", "")
+            add = getattr(item, "cmd_add", "")
+            search = getattr(item, "cmd_search", "")
+            if m_type == "playlist":
+                cmd = item.show_items_cmd
+            else:
+                cmd = item.cmdstring
+
+            if m_type in SUBMENU_AUDIO_TYPES:
+                showaudiosubmenu = "true"
+            else:
+                showaudiosubmenu = "false"
+
+            if m_type in SUBMENU_SEARCH_TYPES:
+                showsearchsubmenu = "true"
+                debug("SEARCH_COMMAND: {}".format(search), level=xbmc.LOGNOTICE)
+            else:
+                showsearchsubmenu = "false"
+
+            lines = item.text.split("\n")
+            if len(lines) > 1:
+                l_item.setProperty("multiline", "true")
+                l_item.setLabel(lines[0])
+                l_item.setLabel2(lines[1])
+            else:
+                l_item.setProperty("multiline", "false")
+                l_item.setLabel(lines[0])
+
+            l_item.setInfo("music", {"Title": item.text})
+            l_item.setProperty("Type", m_type)
+            l_item.setProperty("cmd", cmd)
+            l_item.setProperty("play", play)
+            l_item.setProperty("playnext", playnext)
+            l_item.setProperty("add", add)
+            l_item.setProperty("search", search)
+            l_item.setProperty("showaudiosubmenu", showaudiosubmenu)
+            l_item.setProperty("showsearchsubmenu", showsearchsubmenu)
+            l_item.setIconImage(item.icon)
+            menubox.addItem(l_item)
+
+    def _build_submenu(self, control, items):
+        submenu = self.getControl(control)
+        submenu.reset()
+        for item in items:
+            l = xbmcgui.ListItem()
+            l.setLabel(item[0])
+            l.setProperty("action", item[1])
+            submenu.addItem(l)
+
+    def build_submenus(self):
+        for control, items in SUBMENUS.iteritems():
+            self._build_submenu(control, items)
+
+    # def set_submenu(self, menutype=None):
+    #     debug(menutype, level=xbmc.LOGNOTICE)
+    #     menu = {"audio":
+    #                [("Play", "play"),
+    #                 ("Play Next", "playnext"),
+    #                 ("Queue", "add")],
+    #             "playlist":
+    #                [("Play", "play"),
+    #                 ("Play Next", "playnext"),
+    #                 ("Queue", "add")],
+    #             "search":
+    #                 [("Search", "search")]
+    #             }
+    #
+    #     if menutype in menu:
+    #         self.submenubox.reset()
+    #
+    #         for item in menu[menutype]:
+    #             l = xbmcgui.ListItem()
+    #             l.setLabel(item[0])
+    #             l.setProperty("action", item[1])
+    #             self.submenubox.addItem(l)
+    #
+    #         return True
+    #
+    #     else:
+    #
+    #         return False
+
 
     def show_progress(self):
         """Method to increase progress bar state. Should be run as a thread to
@@ -527,8 +747,12 @@ class SqueezeInfo(xbmcgui.WindowXML):
         if not self.abort:
             self.exit("*")
 
-    @ch.action("parentdir", "*")
-    @ch.action("previousmenu", "*")
+    ############ ACTIONS #######################################################
+
+    ## Now Playing #############################################################
+
+    @ch.action("parentdir", CONTROL_DEFAULT)
+    @ch.action("previousmenu", CONTROL_DEFAULT)
     def exit(self, controlid):
         self.cbserver.abort = True
         self.cbserver.join()
@@ -541,15 +765,41 @@ class SqueezeInfo(xbmcgui.WindowXML):
         del self.player
         self.close()
 
-    @ch.action("left", "*")
+    @ch.action("left", CONTROL_DEFAULT)
     def on_left(self, controlid):
-        if controlid not in SKIN_CONTROLS:
-            self.change_player(-1)
+        self.change_player(-1)
 
-    @ch.action("right", "*")
+    @ch.action("right", CONTROL_DEFAULT)
     def on_right(self, controlid):
-        if controlid not in SKIN_CONTROLS:
-            self.change_player(1)
+        self.change_player(1)
+
+    @ch.action("number0", CONTROL_DEFAULT)
+    @ch.action("number0", CONTROL_PLAYLIST)
+    def toggle_playlist(self, controlid):
+        if self.show_playlist:
+            self.display_playlist(hide=True)
+        else:
+            self.display_playlist()
+
+    @ch.action("number9", CONTROL_DEFAULT)
+    def toggle_menu(self, controlid):
+        if self.show_menu:
+            self.show_menu = False
+            self.setProperty("SQUEEZEINFO_SHOW_MENU", "false")
+            self.setFocusId(10)
+        else:
+            self.set_menu()
+            self.show_menu = True
+            self.setProperty("SQUEEZEINFO_SHOW_MENU", "true")
+            sleep(0.6)
+            self.setFocusId(CONTROL_MENU)
+
+    ## Playlist ################################################################
+
+    @ch.action("parentdir", CONTROL_PLAYLIST)
+    @ch.action("previousmenu", CONTROL_PLAYLIST)
+    def close_playlist(self, controlid):
+        self.display_playlist(hide=True)
 
     @ch.action("select", CONTROL_PLAYLIST)
     def click_playlist(self, controlid):
@@ -557,16 +807,46 @@ class SqueezeInfo(xbmcgui.WindowXML):
         index = listbox.getSelectedPosition()
         self.player.playlist_play_index(index)
 
-    @ch.action("number0", "*")
-    def toggle_playlist(self, controlid):
-        if self.show_playlist:
-            self.show_playlist = False
-            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "false")
+    ## Squeezemenu #############################################################
+
+    @ch.action("right", CONTROL_MENU)
+    def show_submenu(self, controlid):
+        self.display_submenu()
+
+    @ch.action("previousmenu", CONTROL_MENU)
+    def close_menu(self, controlid):
+        self.menu_history = []
+        self.display_menu(hide=True)
+
+    @ch.action("parentdir", CONTROL_MENU)
+    def previous_menu(self, controlid):
+        if self.menu_history:
+            self.menu_back()
         else:
-            self.set_playlist()
-            self.show_playlist = True
-            self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
-            listbox = self.getControl(50)
-            debug("Listbox control: {}".format(listbox))
-            sleep(0.6)
-            self.setFocus(listbox)
+            self.close_menu(controlid)
+
+    @ch.action("select", CONTROL_MENU)
+    def menu_select(self, controlid):
+        self.menu_action()
+
+    ## Squeezemenu - submenu ###################################################
+
+    @ch.action("parentdir", CONTROL_AUDIO_SUBMENU)
+    @ch.action("parentdir", CONTROL_SEARCH_SUBMENU)
+    def submenu_back(self, controlid):
+        if self.menu_history:
+            self.menu_back()
+            self.setFocusId(CONTROL_MENU)
+        else:
+            self.close_menu(controlid)
+
+    @ch.action("previousmenu", CONTROL_AUDIO_SUBMENU)
+    @ch.action("previousmenu", CONTROL_SEARCH_SUBMENU)
+    def close_submenu(self, controlid):
+        self.menu_history = []
+        self.display_menu(hide=True)
+
+    @ch.action("select", CONTROL_AUDIO_SUBMENU)
+    @ch.action("select", CONTROL_SEARCH_SUBMENU)
+    def clickaction(self, controlid=None):
+        self.submenu_action(controlid)

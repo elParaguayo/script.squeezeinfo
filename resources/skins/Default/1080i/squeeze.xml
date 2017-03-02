@@ -1,17 +1,16 @@
 <window id="1140">
 
-  <!-- <defaultcontrol>10</defaultcontrol> -->
+  <defaultcontrol>10</defaultcontrol>
 
   <controls>
 
-    <!-- <control type="button" id="10">
+    <control type="button" id="10">
       <left>2000</left>
       <width>100%</width>
       <height>100%</height>
       <visible>true</visible>
       <onclick></onclick>
-      <onup>50</onup>
-    </control> -->
+    </control>
 
    <!-- Background image -->
     <control type="multiimage">
@@ -491,10 +490,410 @@
                    <align>left</align>
                    <info>ListItem.Artist</info>
            </control>
-               </focusedlayout>
+        </focusedlayout>
    </control>
 
 
+   <control type="group" id="100">
+     <visible>false</visible>
+     <left>520</left>
+     <top>-500</top>
+     <width>2000</width>
+     <height>500</height>
+     <animation type="Visible">
+        <effect type="fade" start="0" end="100" time="300" />
+        <effect type="slide" end="0,760" time="700" tween="back" easing="out" />
+     </animation>
+     <animation type="Hidden">
+        <effect type="slide" start="0,760" end="0,0" time="700" delay="0" tween="back" easing="in"/>
+        <effect type="fade" start="100" end="0" time="300" delay="400" />
+     </animation>
+
+   <control type="list" id="101">
+         <description>Menu container</description>
+         <width>850</width>
+         <!-- <visible>String.IsEqual(Window.Property("SQUEEZEINFO_SHOW_PLAYLIST"),true)</visible> -->
+         <height>460</height>
+         <visible>true</visible>
+         <viewtype>list</viewtype>
+         <orientation>vertical</orientation>
+         <pagecontrol>25</pagecontrol>
+         <autoscroll>false</autoscroll>
+         <preloaditems>true</preloaditems>
+         <scrolltime tween="sine" easing="out">400</scrolltime>
+
+         <itemlayout width="850" height="77">
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>850</width>
+                   <height>75</height>
+                   <texture>squeezeinfo-bg.png</texture>
+           </control>
+
+           <control type="image">
+                   <left>2</left>
+                   <top>2</top>
+                   <width>70</width>
+                   <height>70</height>
+                   <info>ListItem.Icon</info>
+           </control>
+
+           <control type="label">
+                   <left>80</left>
+                   <top>2</top>
+                   <width>760</width>
+                   <height>75</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>!String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label</info>
+           </control>
+           <control type="label">
+                   <left>80</left>
+                   <top>2</top>
+                   <width>760</width>
+                   <height>31</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label</info>
+           </control>
+           <control type="label">
+                   <left>80</left>
+                   <top>35</top>
+                   <width>760</width>
+                   <height>35</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label2</info>
+           </control>
+         </itemlayout>
+         <focusedlayout height="77" width="850">
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>850</width>
+                   <height>75</height>
+                   <visible>Control.HasFocus(101)</visible>
+                   <texture>squeezeinfo-highlight.png</texture>
+           </control>
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>850</width>
+                   <height>75</height>
+                   <visible>!Control.HasFocus(101)</visible>
+                   <texture>squeezeinfo-bg.png</texture>
+           </control>
+           <control type="image">
+                   <left>2</left>
+                   <top>2</top>
+                   <width>70</width>
+                   <height>70</height>
+                   <info>ListItem.Icon</info>
+           </control>
+           <control type="label">
+                   <left>80</left>
+                   <top>2</top>
+                   <width>760</width>
+                   <height>75</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>!String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label</info>
+           </control>
+           <control type="label">
+                   <left>80</left>
+                   <top>2</top>
+                   <width>760</width>
+                   <height>31</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label</info>
+           </control>
+           <control type="label">
+                   <left>80</left>
+                   <top>35</top>
+                   <width>760</width>
+                   <height>35</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>left</align>
+                   <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                   <info>ListItem.Label2</info>
+           </control>
+        </focusedlayout>
+   </control>
+
+
+   <!-- <control type="grouplist" id="1010">
+
+     <description>My first group list control</description>
+     <defaultcontrol>1011</defaultcontrol>
+     <left>1460</left>
+     <top>0</top>
+     <width>150</width>
+     <height>auto</height>
+     <itemgap>2</itemgap>
+     <pagecontrol>25</pagecontrol>
+     <scrolltime tween="sine" easing="out">200</scrolltime>
+     <orientation>vertical</orientation>
+     <usecontrolcoords>true</usecontrolcoords>
+     <visible>true</visible>
+     <onup>1010</onup>
+     <ondown>1010</ondown>
+     <onleft>101</onleft>
+     <align>right</align>
+     <aligny>top</aligny>
+     <texture>squeezeinfo-bg.png</texture>
+     <animation effect="slide" start="0,0" end="-600,0" time="250">Focus</animation>
+      <animation effect="slide" start="-600,0" end="0,0" time="250">Unfocus</animation>
+
+     <control type="button" id="1011">
+       <description>play</description>
+       <width>300</width>
+       <height>75</height>
+       <font>font13</font>
+       <aligny>center</aligny>
+       <align>left</align>
+       <label>$INFO[Container(101).ListItem(0).Property(Type)]</label>
+       <texturefocus>squeezeinfo-highlight.png</texturefocus>
+       <texturenofocus>squeezeinfo-bg.png</texturenofocus>
+     </control>
+
+     <control type="button" id="1012">
+       <description>play</description>
+       <width>300</width>
+       <height>75</height>
+       <font>font13</font>
+       <aligny>center</aligny>
+       <align>left</align>
+       <label>$INFO[Container(101).ListItem(0).Title]</label>
+       <texturefocus>squeezeinfo-highlight.png</texturefocus>
+       <texturenofocus>squeezeinfo-bg.png</texturenofocus>
+     </control>
+
+     <control type="button" id="1013">
+       <description>play</description>
+       <width>300</width>
+       <height>75</height>
+       <font>font13</font>
+       <aligny>center</aligny>
+       <align>left</align>
+       <label>$INFO[Container(101).ListItem(0).Title]</label>
+       <texturefocus>squeezeinfo-highlight.png</texturefocus>
+       <texturenofocus>squeezeinfo-bg.png</texturenofocus>
+     </control>
+
+     <control type="button" id="1014">
+       <description>play</description>
+       <width>300</width>
+       <height>75</height>
+       <font>font13</font>
+       <aligny>center</aligny>
+       <align>left</align>
+       <label>Search</label>
+       <texturefocus>squeezeinfo-highlight.png</texturefocus>
+       <texturenofocus>squeezeinfo-bg.png</texturenofocus>
+     </control>
+
+   </control> -->
+
+<control type="list" id="410100">
+
+     <description>Audio submenu</description>
+     <left>1460</left>
+     <top>0</top>
+     <width>250</width>
+     <height>308</height>
+     <itemgap>2</itemgap>
+     <pagecontrol>25</pagecontrol>
+     <scrolltime tween="sine" easing="out">200</scrolltime>
+     <orientation>vertical</orientation>
+     <visible>true</visible>
+     <onup>4141</onup>
+     <ondown>4141</ondown>
+     <onleft>101</onleft>
+     <animation effect="slide" start="0,0" end="-600,0" time="250" condition="String.IsEqual(Container(101).ListItem(0).Property(showaudiosubmenu),true)">Conditional</animation> -->
+
+
+      <itemlayout width="250" height="77">
+
+        <control type="group">
+          <left>0</left>
+          <top>0</top>
+          <width>250</width>
+          <height>75</height>
+          <visible>true</visible>
+
+        <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>250</width>
+                <height>75</height>
+                <texture>squeezeinfo-bg.png</texture>
+        </control>
+
+        <control type="label">
+                <left>0</left>
+                <top>0</top>
+                <width>250</width>
+                <height>75</height>
+                <font>font13</font>
+                <aligny>center</aligny>
+                <align>center</align>
+                <info>ListItem.Label</info>
+        </control>
+
+      </control>
+
+      </itemlayout>
+
+      <focusedlayout height="77" width="250">
+        <control type="group">
+          <left>0</left>
+          <top>0</top>
+          <width>250</width>
+          <height>75</height>
+          <visible>true</visible>
+
+        <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>250</width>
+                <height>75</height>
+                <visible>Control.HasFocus(410100)</visible>
+                <texture>squeezeinfo-highlight.png</texture>
+        </control>
+
+        <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>250</width>
+                <height>75</height>
+                <visible>!Control.HasFocus(410100)</visible>
+                <texture>squeezeinfo-bg.png</texture>
+        </control>
+
+        <control type="label">
+                <left>0</left>
+                <top>0</top>
+                <width>250</width>
+                <height>75</height>
+                <font>font13</font>
+                <aligny>center</aligny>
+                <align>center</align>
+                <info>ListItem.Label</info>
+        </control>
+      </control>
+
+      </focusedlayout>
+
+
+   </control>
+
+   <control type="list" id="410101">
+
+        <description>Search submenu</description>
+        <left>1460</left>
+        <top>0</top>
+        <width>250</width>
+        <height>308</height>
+        <itemgap>2</itemgap>
+        <pagecontrol>25</pagecontrol>
+        <scrolltime tween="sine" easing="out">200</scrolltime>
+        <orientation>vertical</orientation>
+        <visible>true</visible>
+        <onup>4141</onup>
+        <ondown>4141</ondown>
+        <onleft>101</onleft>
+        <animation effect="slide" start="0,0" end="-600,0" time="250" condition="String.IsEqual(Container(101).ListItem(0).Property(showsearchsubmenu),true)">Conditional</animation> -->
+
+
+         <itemlayout width="250" height="77">
+
+           <control type="group">
+             <left>0</left>
+             <top>0</top>
+             <width>250</width>
+             <height>75</height>
+             <visible>true</visible>
+
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>250</width>
+                   <height>75</height>
+                   <texture>squeezeinfo-bg.png</texture>
+           </control>
+
+           <control type="label">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>250</width>
+                   <height>75</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>center</align>
+                   <info>ListItem.Label</info>
+           </control>
+
+         </control>
+
+         </itemlayout>
+
+         <focusedlayout height="77" width="250">
+           <control type="group">
+             <left>0</left>
+             <top>0</top>
+             <width>250</width>
+             <height>75</height>
+             <visible>true</visible>
+
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>250</width>
+                   <height>75</height>
+                   <visible>Control.HasFocus(410101)</visible>
+                   <texture>squeezeinfo-highlight.png</texture>
+           </control>
+
+           <control type="image">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>250</width>
+                   <height>75</height>
+                   <visible>!Control.HasFocus(410101)</visible>
+                   <texture>squeezeinfo-bg.png</texture>
+           </control>
+
+           <control type="label">
+                   <left>0</left>
+                   <top>0</top>
+                   <width>250</width>
+                   <height>75</height>
+                   <font>font13</font>
+                   <aligny>center</aligny>
+                   <align>center</align>
+                   <info>ListItem.Label</info>
+           </control>
+         </control>
+
+         </focusedlayout>
+
+
+      </control>
+
+ </control>
 
   </controls>
 
