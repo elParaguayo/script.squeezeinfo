@@ -1,3 +1,0 @@
-import xbmcgui
-
-class
