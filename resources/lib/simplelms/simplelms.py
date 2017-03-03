@@ -168,6 +168,7 @@ class LMSServer(object):
         self.host = host
         self.port = port
         self.id = 1
+        self.web = "http://{h}:{p}/".format(h=host, p=port)
         self.url = "http://{h}:{p}/jsonrpc.js".format(h=host, p=port)
 
     def request(self, player="-", params=None):
