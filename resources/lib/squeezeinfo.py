@@ -95,6 +95,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.show_playlist = False
         self.show_menu = False
         self.menu_history = []
+        self.server_connected = False
+        self.has_playlist = False
+        self.has_player = False
 
 
         # Set the location of the server
@@ -143,6 +146,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZEINFO_SERVER_CONNECTED", "true")
         self.setProperty("SQUEEZEINFO_HAS_PLAYER", "false")
         self.setProperty("SQUEEZEINFO_HAS_NEXT_TRACK", "false")
+        self.setProperty("SQUEEZEINFO_SHOW_MENU", "false")
         self.setProperty("SQUEEZE_IMAGE_FOLDER",
                          os.path.join(CACHE_PATH, IMG_ICON))
 
@@ -274,12 +278,14 @@ class SqueezeInfo(xbmcgui.WindowXML):
                 # Setting this property will cause the "Now Playing" bar to be
                 # displayed on the skin.
                 self.setProperty("SQUEEZEINFO_HAS_PLAYER", "true")
+                self.has_player = True
                 self.player = self.get_cur_player()
                 self.get_sync_groups()
 
             else:
                 # No players so we need to hide the "Now Playing" bar
                 self.setProperty("SQUEEZEINFO_HAS_PLAYER", "false")
+                self.has_player = False
         else:
             debug("Can't connect to server. No players.")
             self.players = []
@@ -305,6 +311,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.set_now_playing(track[0])
         else:
             self.setProperty("SQUEEZEINFO_HAS_PLAYLIST", "false")
+            self.has_playlist = False
 
         # If there are two tracks then we should display the next track too
         if len(track) == 2:
@@ -331,6 +338,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # after the data has been populated.
         if track:
             self.setProperty("SQUEEZEINFO_HAS_PLAYLIST", "true")
+            self.has_playlist = True
 
     def get_metadata(self, track, process_image=True):
         """Method to output the track metadata."""
@@ -497,11 +505,14 @@ class SqueezeInfo(xbmcgui.WindowXML):
         return text
 
     def display_playlist(self, hide=False):
+
         if hide:
             self.show_playlist = False
             self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "false")
             self.set_default_focus()
         else:
+            if not self.has_playlist:
+                return
             self.set_playlist()
             self.show_playlist = True
             self.setProperty("SQUEEZEINFO_SHOW_PLAYLIST", "true")
@@ -519,6 +530,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.setProperty("SQUEEZEINFO_SHOW_MENU", "false")
             self.setFocusId(CONTROL_DEFAULT)
         else:
+            if not self.has_player:
+                return
             self.set_menu()
             self.show_menu = True
             self.setProperty("SQUEEZEINFO_SHOW_MENU", "true")
