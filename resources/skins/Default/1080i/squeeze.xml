@@ -308,7 +308,9 @@
             <animation type="Visible">
                 <effect type="fade" start="100" end="0" time="3000" delay="0" tween="quadratic" easing="in"/>
             </animation>
-
+            <animation type="Conditional" condition="String.IsEqual(Window.Property(SQUEEZEINFO_HAS_PLAYLIST),false)">
+                <effect type="slide" end="0,-270" time="0" delay="0" tween="quadratic" easing="in"/>
+            </animation>
             <control type="image">
                 <width>100%</width>
                 <height>100%</height>
