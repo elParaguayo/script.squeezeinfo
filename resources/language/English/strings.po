@@ -19,7 +19,7 @@ msgstr ""
 #settings labels
 
 msgctxt "#32000"
-msgid "Server IP address"
+msgid "Server address"
 msgstr ""
 
 msgctxt "#32001"
