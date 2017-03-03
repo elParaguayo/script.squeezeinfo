@@ -34,6 +34,10 @@ class LMSMenuItemBase(object):
     def _get_icon(self, menuitem):
 
         icon = menuitem.get("icon", None)
+
+        if icon is None:
+            icon = menuitem.get("icon-id", None)
+
         if icon is None:
             icon = menuitem.get("window", dict()).get("icon-id", None)
 

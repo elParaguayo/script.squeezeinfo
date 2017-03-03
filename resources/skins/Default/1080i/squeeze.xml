@@ -292,7 +292,7 @@
                 <font>font02</font>
                 <align>center</align>
                 <aligny>center</aligny>
-                <label>Player has no playlist</label>
+                <label>$INFO[Window.Property(SQUEEZEINFO_PLAYER_NAME)] has no playlist</label>
             </control>
 
         </control>
@@ -647,6 +647,14 @@
                     start="0,0"
                     end="-600,0"
                     time="250"
+                    delay="500"
+                    condition="String.IsEqual(Container(101).ListItem(0).Property(showaudiosubmenu),true)">
+                    Conditional
+                </animation>
+                <animation
+                    effect="slide"
+                    end="0,0"
+                    time="250"
                     condition="String.IsEqual(Container(101).ListItem(0).Property(showaudiosubmenu),true)">
                     Conditional
                 </animation>
@@ -745,10 +753,17 @@
                     start="0,0"
                     end="-600,0"
                     time="250"
+                    delay="500"
                     condition="String.IsEqual(Container(101).ListItem(0).Property(showsearchsubmenu),true)">
                     Conditional
                 </animation>
-
+                <animation
+                    effect="slide"
+                    end="0,0"
+                    time="250"
+                    condition="!String.IsEqual(Container(101).ListItem(0).Property(showsearchsubmenu),true)">
+                    Conditional
+                </animation>
                 <itemlayout width="250" height="77">
 
                     <control type="group">

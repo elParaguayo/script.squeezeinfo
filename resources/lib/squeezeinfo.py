@@ -280,6 +280,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
                 self.setProperty("SQUEEZEINFO_HAS_PLAYER", "true")
                 self.has_player = True
                 self.player = self.get_cur_player()
+                self.setProperty("SQUEEZEINFO_PLAYER_NAME", self.player.name)
                 self.get_sync_groups()
 
             else:
