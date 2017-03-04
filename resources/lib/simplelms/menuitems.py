@@ -123,7 +123,10 @@ class PlaylistMenuItem(LMSMenuItemBase):
             cmd += self.format_dict_cmd(act.get("params", dict()))
             key = act.get("itemsParams")
             if key:
-                cmd += self.format_dict_cmd(self.menuitem[key])
+                try:
+                    cmd += self.format_dict_cmd(self.menuitem[key])
+                except KeyError:
+                    pass
 
         return cmd
 

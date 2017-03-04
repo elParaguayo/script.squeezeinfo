@@ -461,6 +461,7 @@
                     <font>font13</font>
                     <aligny>center</aligny>
                     <align>left</align>
+                    <scroll>true</scroll>
                     <info>ListItem.Title</info>
                 </control>
 
@@ -472,6 +473,7 @@
                     <font>font13</font>
                     <aligny>center</aligny>
                     <align>left</align>
+                    <scroll>true</scroll>
                     <info>ListItem.Artist</info>
                 </control>
 
@@ -598,6 +600,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>!String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label</info>
                     </control>
 
@@ -610,6 +613,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label</info>
                     </control>
 
@@ -622,6 +626,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label2</info>
                     </control>
 
@@ -840,7 +845,142 @@
 
             </control>
 
-        </control>
+       </control>
+
+       <control type="group" id="410400">
+           <left>575</left>
+           <top>-80</top>
+           <visible>false</visible>
+           <animation type="Visible">
+               <effect type="fade" start="0" end="100" time="300"/>
+               <effect type="slide" end="0,580" time="700" tween="back" easing="out"/>
+           </animation>
+           <animation type="Hidden">
+               <effect type="slide" start="0,580" end="0,0" time="700" delay="0" tween="back" easing="in"/>
+               <effect type="fade" start="100" end="0" time="300" delay="400"/>
+           </animation>
+
+           <control type="list" id="410500">
+
+               <description>Player Controls</description>
+               <left>0</left>
+               <top>0</top>
+               <width>780</width>
+               <height>80</height>
+               <pagecontrol>25</pagecontrol>
+               <scrolltime tween="sine" easing="out">200</scrolltime>
+               <orientation>horizontal</orientation>
+               <visible>true</visible>
+               <onleft>410500</onleft>
+               <onright>410500</onright>
+
+               <itemlayout width="155" height="80">
+
+                       <control type="image">
+                           <left>0</left>
+                           <top>0</top>
+                           <width>150</width>
+                           <height>80</height>
+                           <texture>squeezeinfo-bg.png</texture>
+                       </control>
+
+                       <control type="image">
+                           <left>55</left>
+                           <top>20</top>
+                           <width>40</width>
+                           <height>40</height>
+                           <aligny>center</aligny>
+                           <align>center</align>
+                           <colordiffuse>99FFFFFF</colordiffuse>
+                           <info>ListItem.Icon</info>
+                       </control>
+
+               </itemlayout>
+
+               <focusedlayout height="80" width="155">
+
+                     <control type="image">
+                         <left>0</left>
+                         <top>0</top>
+                         <width>150</width>
+                         <height>80</height>
+                         <texture>squeezeinfo-bg.png</texture>
+                     </control>
+
+                     <control type="image">
+                         <left>55</left>
+                         <top>20</top>
+                         <width>40</width>
+                         <height>40</height>
+                         <aligny>center</aligny>
+                         <align>center</align>
+                         <colordiffuse>FF8DDDFF</colordiffuse>
+                         <info>ListItem.Icon</info>
+                     </control>
+
+               </focusedlayout>
+
+           </control>
+
+           <control type="image">
+
+               <left>0</left>
+               <top>90</top>
+               <width>770</width>
+               <height>50</height>
+               <texture>squeezeinfo-bg.png</texture>
+               <visible>true</visible>
+
+           </control>
+
+           <control type="label">
+
+               <left>0</left>
+               <top>90</top>
+               <width>770</width>
+               <height>50</height>
+               <label>$INFO[Container(410500).ListItem(0).Label]</label>
+               <align>center</align>
+               <visible>true</visible>
+
+           </control>
+
+           <control type="group">
+               <left>620</left>
+               <top>-50</top>
+               <visible>String.IsEqual(Container(410500).ListItem(0).Property(action),volume)</visible>
+
+               <animation type="Visible">
+                   <effect type="fade" start="0" end="100" time="200" delay="400"/>
+                   <effect type="slide" start="0,50" end="0,0" time="700" delay="0"/>
+               </animation>
+               <animation type="Hidden">
+                   <effect type="fade" start="100" end="0" time="200" delay="0"/>
+                   <effect type="slide" start="0,0" end="0,50" time="700" delay="0"/>
+               </animation>
+
+               <control type="image">
+                   <width>150</width>
+                   <height>40</height>
+                   <texture>squeezeinfo-bg.png</texture>
+                   <visible>true</visible>
+
+               </control>
+
+
+               <control type="label">
+                   <width>150</width>
+                   <height>40</height>
+                   <aligny>center</aligny>
+                   <align>center</align>
+
+                   <info>Window.Property(SQUEEZEINFO_PLAYER_VOLUME)</info>
+
+               </control>
+
+           </control>
+
+       </control>
 
     </controls>
 

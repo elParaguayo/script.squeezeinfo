@@ -43,6 +43,7 @@ CONTROL_MENU = 101
 CONTROL_MENU_PLAY = 414141
 CONTROL_AUDIO_SUBMENU = 410100
 CONTROL_SEARCH_SUBMENU = 410101
+CONTROL_PLAYER_CONTROL = 410500
 SKIN_CONTROLS = [CONTROL_PLAYLIST, CONTROL_MENU, CONTROL_MENU_GROUP, CONTROL_MENU_PLAY, 1011, 1012, 1013]
 
 SUBMENU_AUDIO_TYPES = ["audio", "playlist"]
@@ -54,6 +55,12 @@ SUBMENUS = {CONTROL_AUDIO_SUBMENU:
             CONTROL_SEARCH_SUBMENU:
                 [("Search", "search")]
             }
+
+PLAYER_CONTROLS = [("previous", "Previous Track"),
+                   ("playpause", "Play/Pause"),
+                   ("stop", "Stop"),
+                   ("next", "Next Track"),
+                   ("volume", "Adjust Volume")]
 
 # Initialise the action handler
 ch = ActionHandler()
@@ -147,6 +154,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZEINFO_HAS_PLAYER", "false")
         self.setProperty("SQUEEZEINFO_HAS_NEXT_TRACK", "false")
         self.setProperty("SQUEEZEINFO_SHOW_MENU", "false")
+        self.setProperty("SQUEEZEINFO_SHOW_CONTROLS", "false")
         self.setProperty("SQUEEZE_IMAGE_FOLDER",
                          os.path.join(CACHE_PATH, IMG_ICON))
 
@@ -156,9 +164,13 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.menubox = self.getControl(CONTROL_MENU_GROUP)
         self.menubox.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_MENU),true)")
 
+        self.playercontrols = self.getControl(410400)
+        self.playercontrols.setVisibleCondition("String.IsEqual(Window.Property(SQUEEZEINFO_SHOW_CONTROLS),true)")
+
         self.audiosubmenu = self.getControl(CONTROL_AUDIO_SUBMENU)
         self.searchsubmenu = self.getControl(CONTROL_SEARCH_SUBMENU)
         self.build_submenus()
+        self.build_player_controls()
         # self.submenubox.setVisibleCondition("String.IsEqual(Container(101).ListItem(0).Property(showsubmenu),true)")
 
         # Let's see if the server is working
@@ -201,8 +213,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # Start the callback server to listen for events
         debug("OnInit - starting callback server")
         self.cbserver.start()
-
-        #self.set_playlist()
 
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
@@ -281,6 +291,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
                 self.has_player = True
                 self.player = self.get_cur_player()
                 self.setProperty("SQUEEZEINFO_PLAYER_NAME", self.player.name)
+                self.set_vol_label()
                 self.get_sync_groups()
 
             else:
@@ -471,7 +482,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
     def vol_change(self, event=None):
         """Method to trigger actions when volume changes."""
-        pass
+        if self.getCallbackPlayer(event) == self.cur_player:
+            self.set_vol_label()
 
     def change_player(self, step):
         self.setProperty("SQUEEZEINFO_CHANGE_PLAYER", "false")
@@ -487,10 +499,16 @@ class SqueezeInfo(xbmcgui.WindowXML):
         self.setProperty("SQUEEZEINFO_CHANGE_PLAYER", "true")
         self.get_info()
 
+    def set_vol_label(self):
+        label = "{}%".format(self.player.get_volume())
+        self.setProperty("SQUEEZEINFO_PLAYER_VOLUME", label)
+
     def vol_up(self):
         """Method to increase current player's volume."""
         try:
             self.player.volume_up()
+            self.set_vol_label()
+
         except:
             pass
 
@@ -498,6 +516,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         """Method to decrease current player's volume."""
         try:
             self.player.volume_down()
+            self.set_vol_label()
         except:
             pass
 
@@ -581,8 +600,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
                 cmd = cmd.replace("__TAGGEDINPUT__", text)
                 debug("COMMAND_REPLACE: {}".format(cmd), level=xbmc.LOGNOTICE)
                 self.set_menu(menucmd=cmd)
-                sleep(0.1)
+                sleep(0.5)
                 self.setFocusId(CONTROL_MENU)
+                self.getControl(CONTROL_MENU).selectItem(0)
 
     def display_submenu(self):
         menu = self.getControl(CONTROL_MENU)
@@ -596,7 +616,11 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def set_playlist(self):
         listbox = self.getControl(CONTROL_PLAYLIST)
 
+        listbox.reset()
+
         pl_items = self.player.playlist_get_detail()
+
+        items = []
 
         for i, plitm in enumerate(pl_items):
             item = xbmcgui.ListItem()
@@ -604,7 +628,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
                                                           process_image=False)
             item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
             item.setIconImage(icon)
-            listbox.addItem(item)
+            items.append(item)
+
+        listbox.addItems(items)
 
         pos = self.player.playlist_get_position()
         listbox.selectItem(pos)
@@ -620,6 +646,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
             menu = handle.getMenu(menucmd=menucmd)
 
         menubox.reset()
+
+        items = []
 
         for item in menu:
             l_item = xbmcgui.ListItem()
@@ -663,7 +691,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
             l_item.setProperty("showaudiosubmenu", showaudiosubmenu)
             l_item.setProperty("showsearchsubmenu", showsearchsubmenu)
             l_item.setIconImage(item.icon)
-            menubox.addItem(l_item)
+            items.append(l_item)
+
+        menubox.addItems(items)
 
     def _build_submenu(self, control, items):
         submenu = self.getControl(control)
@@ -677,6 +707,18 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def build_submenus(self):
         for control, items in SUBMENUS.iteritems():
             self._build_submenu(control, items)
+
+    def build_player_controls(self):
+        control = self.getControl(CONTROL_PLAYER_CONTROL)
+        control.reset()
+        for item_name, item_label in PLAYER_CONTROLS:
+            l = xbmcgui.ListItem()
+            l.setProperty("action", item_name)
+            l.setLabel(item_label)
+            debug("squeezeinfo-{}.png".format(item_name), level=xbmc.LOGNOTICE)
+            l.setIconImage("squeezeinfo-{}.png".format(item_name))
+            control.addItem(l)
+        control.setVisibleCondition("true")
 
     # def set_submenu(self, menutype=None):
     #     debug(menutype, level=xbmc.LOGNOTICE)
@@ -738,6 +780,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
                     self.elapsed = e
                     self.duration = d
 
+                debug(self.getControl(CONTROL_PLAYER_CONTROL).getPosition(), level=xbmc.LOGNOTICE)
+
             # Otherwise, just manually increase progress bar
             else:
                 if self.playing:
@@ -767,6 +811,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
     @ch.action("parentdir", CONTROL_DEFAULT)
     @ch.action("previousmenu", CONTROL_DEFAULT)
+    @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
     def exit(self, controlid):
         self.cbserver.abort = True
         self.cbserver.join()
@@ -807,6 +852,12 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.setProperty("SQUEEZEINFO_SHOW_MENU", "true")
             sleep(0.6)
             self.setFocusId(CONTROL_MENU)
+
+    @ch.action("number8", CONTROL_DEFAULT)
+    def show_player_controls(self, controlid):
+        self.setProperty("SQUEEZEINFO_SHOW_CONTROLS","true")
+        sleep(0.1)
+        self.setFocusId(CONTROL_PLAYER_CONTROL)
 
     ## Playlist ################################################################
 
@@ -864,3 +915,46 @@ class SqueezeInfo(xbmcgui.WindowXML):
     @ch.action("select", CONTROL_SEARCH_SUBMENU)
     def clickaction(self, controlid=None):
         self.submenu_action(controlid)
+
+    ## Player controls #########################################################
+
+    @ch.action("up", CONTROL_PLAYER_CONTROL)
+    def pl_vol_up(self, controlid):
+        control = self.getControl(controlid)
+        action = control.getSelectedItem().getProperty("action")
+        if action == "volume":
+            self.vol_up()
+
+    @ch.action("down", CONTROL_PLAYER_CONTROL)
+    def pl_vol_up(self, controlid):
+        control = self.getControl(controlid)
+        action = control.getSelectedItem().getProperty("action")
+        if action == "volume":
+            self.vol_down()
+
+    @ch.action("select", CONTROL_PLAYER_CONTROL)
+    def player_control_select(self, controlid):
+        control = self.getControl(controlid)
+        action = control.getSelectedItem().getProperty("action")
+
+        if not self.has_player:
+            return
+
+        if action == "previous":
+            self.player.prev()
+
+        elif action == "playpause":
+            self.player.toggle()
+
+        elif action == "stop":
+            self.player.stop()
+
+        elif action == "next":
+            self.player.next()
+
+    @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
+    @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
+    def close_player_controls(self, controlid):
+        self.setProperty("SQUEEZEINFO_SHOW_CONTROLS","false")
+        sleep(0.1)
+        self.setFocusId(CONTROL_DEFAULT)
