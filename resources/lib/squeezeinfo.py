@@ -596,9 +596,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
             if text:
                 text = quote_plus(text)
                 cmd = menuitem.getProperty("search")
-                debug("COMMAND: {}".format(cmd), level=xbmc.LOGNOTICE)
                 cmd = cmd.replace("__TAGGEDINPUT__", text)
-                debug("COMMAND_REPLACE: {}".format(cmd), level=xbmc.LOGNOTICE)
                 self.set_menu(menucmd=cmd)
                 sleep(0.5)
                 self.setFocusId(CONTROL_MENU)
@@ -668,7 +666,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
             if m_type in SUBMENU_SEARCH_TYPES:
                 showsearchsubmenu = "true"
-                debug("SEARCH_COMMAND: {}".format(search), level=xbmc.LOGNOTICE)
             else:
                 showsearchsubmenu = "false"
 
@@ -715,40 +712,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
             l = xbmcgui.ListItem()
             l.setProperty("action", item_name)
             l.setLabel(item_label)
-            debug("squeezeinfo-{}.png".format(item_name), level=xbmc.LOGNOTICE)
             l.setIconImage("squeezeinfo-{}.png".format(item_name))
             control.addItem(l)
         control.setVisibleCondition("true")
-
-    # def set_submenu(self, menutype=None):
-    #     debug(menutype, level=xbmc.LOGNOTICE)
-    #     menu = {"audio":
-    #                [("Play", "play"),
-    #                 ("Play Next", "playnext"),
-    #                 ("Queue", "add")],
-    #             "playlist":
-    #                [("Play", "play"),
-    #                 ("Play Next", "playnext"),
-    #                 ("Queue", "add")],
-    #             "search":
-    #                 [("Search", "search")]
-    #             }
-    #
-    #     if menutype in menu:
-    #         self.submenubox.reset()
-    #
-    #         for item in menu[menutype]:
-    #             l = xbmcgui.ListItem()
-    #             l.setLabel(item[0])
-    #             l.setProperty("action", item[1])
-    #             self.submenubox.addItem(l)
-    #
-    #         return True
-    #
-    #     else:
-    #
-    #         return False
-
 
     def show_progress(self):
         """Method to increase progress bar state. Should be run as a thread to
@@ -780,8 +746,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
                     self.elapsed = e
                     self.duration = d
 
-                debug(self.getControl(CONTROL_PLAYER_CONTROL).getPosition(), level=xbmc.LOGNOTICE)
-
             # Otherwise, just manually increase progress bar
             else:
                 if self.playing:
@@ -811,7 +775,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
     @ch.action("parentdir", CONTROL_DEFAULT)
     @ch.action("previousmenu", CONTROL_DEFAULT)
-    @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
     def exit(self, controlid):
         self.cbserver.abort = True
         self.cbserver.join()
@@ -952,7 +915,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         elif action == "next":
             self.player.next()
 
-    @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
+    @ch.action("parentdir", CONTROL_PLAYER_CONTROL)
     @ch.action("previousmenu", CONTROL_PLAYER_CONTROL)
     def close_player_controls(self, controlid):
         self.setProperty("SQUEEZEINFO_SHOW_CONTROLS","false")
