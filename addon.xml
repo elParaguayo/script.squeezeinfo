@@ -2,7 +2,7 @@
 
 <addon id="script.squeezeinfo"
        name="Squeeze Info"
-       version="0.0.1"
+       version="0.1.0"
        provider-name="elParaguayo">
 
     <requires>
