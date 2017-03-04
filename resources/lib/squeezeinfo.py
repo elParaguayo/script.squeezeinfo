@@ -214,8 +214,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
         debug("OnInit - starting callback server")
         self.cbserver.start()
 
-        #self.set_playlist()
-
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
         ch.serve_action(action, self.getFocusId(), self)
@@ -602,8 +600,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
                 cmd = cmd.replace("__TAGGEDINPUT__", text)
                 debug("COMMAND_REPLACE: {}".format(cmd), level=xbmc.LOGNOTICE)
                 self.set_menu(menucmd=cmd)
-                sleep(0.1)
+                sleep(0.5)
                 self.setFocusId(CONTROL_MENU)
+                self.getControl(CONTROL_MENU).selectItem(0)
 
     def display_submenu(self):
         menu = self.getControl(CONTROL_MENU)
@@ -617,7 +616,11 @@ class SqueezeInfo(xbmcgui.WindowXML):
     def set_playlist(self):
         listbox = self.getControl(CONTROL_PLAYLIST)
 
+        listbox.reset()
+
         pl_items = self.player.playlist_get_detail()
+
+        items = []
 
         for i, plitm in enumerate(pl_items):
             item = xbmcgui.ListItem()
@@ -625,7 +628,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
                                                           process_image=False)
             item.setInfo("music", {"tracknumber": i + 1, "Title": title, "Artist": artist})
             item.setIconImage(icon)
-            listbox.addItem(item)
+            items.append(item)
+
+        listbox.addItems(items)
 
         pos = self.player.playlist_get_position()
         listbox.selectItem(pos)
@@ -641,6 +646,8 @@ class SqueezeInfo(xbmcgui.WindowXML):
             menu = handle.getMenu(menucmd=menucmd)
 
         menubox.reset()
+
+        items = []
 
         for item in menu:
             l_item = xbmcgui.ListItem()
@@ -684,7 +691,9 @@ class SqueezeInfo(xbmcgui.WindowXML):
             l_item.setProperty("showaudiosubmenu", showaudiosubmenu)
             l_item.setProperty("showsearchsubmenu", showsearchsubmenu)
             l_item.setIconImage(item.icon)
-            menubox.addItem(l_item)
+            items.append(l_item)
+
+        menubox.addItems(items)
 
     def _build_submenu(self, control, items):
         submenu = self.getControl(control)

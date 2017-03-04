@@ -461,6 +461,7 @@
                     <font>font13</font>
                     <aligny>center</aligny>
                     <align>left</align>
+                    <scroll>true</scroll>
                     <info>ListItem.Title</info>
                 </control>
 
@@ -472,6 +473,7 @@
                     <font>font13</font>
                     <aligny>center</aligny>
                     <align>left</align>
+                    <scroll>true</scroll>
                     <info>ListItem.Artist</info>
                 </control>
 
@@ -598,6 +600,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>!String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label</info>
                     </control>
 
@@ -610,6 +613,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label</info>
                     </control>
 
@@ -622,6 +626,7 @@
                         <aligny>center</aligny>
                         <align>left</align>
                         <visible>String.IsEqual(ListItem.Property(multiline),true)</visible>
+                        <scroll>true</scroll>
                         <info>ListItem.Label2</info>
                     </control>
 
