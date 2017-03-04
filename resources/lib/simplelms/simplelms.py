@@ -42,6 +42,34 @@ class LMSPlayer(object):
     def request(self, command):
         return self.server.request(self.ref, command)
 
+    def play(self):
+        """Play"""
+        self.request("play")
+
+    def stop(self):
+        """Stop"""
+        self.request("stop")
+
+    def pause(self):
+        """Pause On"""
+        self.request("pause 1")
+
+    def unpause(self):
+        """Pause Off"""
+        self.request("pause 0")
+
+    def toggle(self):
+        """Play/Pause Toggle"""
+        self.request("pause")
+
+    def next(self):
+        """Next Track"""
+        self.request("playlist jump +1")
+
+    def prev(self):
+        """Previous Track"""
+        self.request("playlist jump -1")
+
     def set_name(self, name):
         self.request("name {}".format(name))
 
@@ -139,6 +167,16 @@ class LMSPlayer(object):
             return response["playlist_loop"]
         except:
             return []
+
+    def get_volume(self):
+        """Get Player Volume"""
+        try:
+            self.volume = int(self.request("mixer volume ?").get("_volume"))
+        except TypeError:
+            self.volume = -1
+        except ValueError:
+            self.volume = 0
+        return self.volume
 
     def volume_up(self, interval=5):
         self.request("mixer volume +{}".format(interval))
