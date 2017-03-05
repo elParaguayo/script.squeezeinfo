@@ -580,7 +580,8 @@
                         <width>850</width>
                         <height>75</height>
                         <visible>!Control.HasFocus(101)</visible>
-                        <texture>squeezeinfo-bg.png</texture>
+                        <colordiffuse>44FFFFFF</colordiffuse>
+                        <texture>squeezeinfo-highlight.png</texture>
                     </control>
 
                     <control type="image">
