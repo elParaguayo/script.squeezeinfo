@@ -9,7 +9,7 @@ from kodi65.actionhandler import ActionHandler
 
 from .customhomemenu import CUSTOM_MENU
 from .image_cache import ImageCache
-from .pylms.callbackserver import CallbackServer
+from .simplelms.callbackserver import CallbackServer
 from .simplelms.artworkresolver import ArtworkResolver
 from .simplelms.simplelms import LMSServer
 from .simplelms.menu import LMSMenuHandler
@@ -64,6 +64,9 @@ PLAYER_CONTROLS = [("previous", "Previous Track"),
 
 # Initialise the action handler
 ch = ActionHandler()
+
+# Initialise the callback server
+squeeze = CallbackServer()
 
 
 def debug(message, level=DEBUG_LEVEL):
@@ -124,26 +127,11 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # Create a callback server to receive asynchronous announcements from
         # the server
         debug("Creating callback server")
-        self.cbserver = CallbackServer(hostname=self.hostname,
-                                       port=self.telnet_port)
+        self.cbserver = squeeze
+        self.cbserver.set_server(hostname=self.hostname,
+                                 port=self.telnet_port,
+                                 parent_class=self)
         self.cbserver.daemon = True
-
-        # Define the events that we want to listen for and assign callbacks
-        debug("Adding callbacks")
-        self.cbserver.add_callback(CallbackServer.PLAYLIST_CHANGED,
-                                   callback=self.track_changed)
-        self.cbserver.add_callback(CallbackServer.PLAYLIST_CHANGE_TRACK,
-                                   callback=self.track_changed)
-        self.cbserver.add_callback(CallbackServer.SERVER_ERROR,
-                                   callback=self.no_server)
-        self.cbserver.add_callback(CallbackServer.SERVER_CONNECT,
-                                   callback=self.server_connect)
-        self.cbserver.add_callback(CallbackServer.VOLUME_CHANGE,
-                                   callback=self.vol_change)
-        self.cbserver.add_callback(CallbackServer.PLAY_PAUSE,
-                                   callback=self.play_pause)
-        self.cbserver.add_callback(CallbackServer.CLIENT_ALL,
-                                   callback=self.client_change)
 
     def onInit(self):
         # Once window has been initialised we can start setting properties
@@ -213,6 +201,7 @@ class SqueezeInfo(xbmcgui.WindowXML):
         # Start the callback server to listen for events
         debug("OnInit - starting callback server")
         self.cbserver.start()
+
 
     def onAction(self, action):
         # Let the action handler deal with this using decorators on methods
@@ -444,46 +433,6 @@ class SqueezeInfo(xbmcgui.WindowXML):
             self.sync_groups = []
 
         debug("Sync groups: {}".format(self.sync_groups))
-
-    def track_changed(self, event=None):
-        """Method to trigger actions when a new track is triggered on server."""
-        debug("track_changed")
-        debug(event)
-        if self.cur_or_sync(self.getCallbackPlayer(event)):
-            self.get_info()
-
-    def no_server(self, event=None):
-        """Method to trigger actions when server becomes unavailable."""
-        debug("no_server: {}".format(event))
-        self.setProperty("SQUEEZEINFO_SERVER_CONNECTED", "false")
-
-    def server_connect(self, event=None):
-        """Method to trigger actions when server becomes available."""
-        debug("server_connect: {}".format(event))
-        self.setProperty("SQUEEZEINFO_SERVER_CONNECTED", "true")
-        self.get_squeeze_players()
-
-    def play_pause(self, event=None):
-        """Method to trigger actions when player state changes."""
-        debug("play_pause: {}".format(event))
-        if self.cur_or_sync(self.getCallbackPlayer(event)):
-            if event.split()[3] == "1":
-                self.playing = False
-            else:
-                self.playing = True
-            debug("Player playing state now: {}".format(self.playing))
-
-    def client_change(self, event=None):
-        """Method to trigger actions when client connects or disconnects."""
-        debug("client_change: {}".format(event))
-        self.get_squeeze_players()
-        if self.players:
-            self.get_info()
-
-    def vol_change(self, event=None):
-        """Method to trigger actions when volume changes."""
-        if self.getCallbackPlayer(event) == self.cur_player:
-            self.set_vol_label()
 
     def change_player(self, step):
         self.setProperty("SQUEEZEINFO_CHANGE_PLAYER", "false")
@@ -768,6 +717,55 @@ class SqueezeInfo(xbmcgui.WindowXML):
 
         if not self.abort:
             self.exit("*")
+
+    ## Squeezeplayer callback events ###########################################
+
+    @squeeze.event(squeeze.PLAYLIST_CHANGED)
+    @squeeze.event(squeeze.PLAYLIST_CHANGE_TRACK)
+    def track_changed(self, event=None):
+        """Method to trigger actions when a new track is triggered on server."""
+        debug("track_changed")
+        debug(event)
+        if self.cur_or_sync(self.getCallbackPlayer(event)):
+            self.get_info()
+
+    @squeeze.event(squeeze.SERVER_ERROR)
+    def no_server(self, event=None):
+        """Method to trigger actions when server becomes unavailable."""
+        debug("no_server: {}".format(event))
+        self.setProperty("SQUEEZEINFO_SERVER_CONNECTED", "false")
+
+    @squeeze.event(squeeze.SERVER_CONNECT)
+    def server_connect(self, event=None):
+        """Method to trigger actions when server becomes available."""
+        debug("server_connect: {}".format(event))
+        self.setProperty("SQUEEZEINFO_SERVER_CONNECTED", "true")
+        self.get_squeeze_players()
+
+    @squeeze.event(squeeze.PLAY_PAUSE)
+    def play_pause(self, event=None):
+        """Method to trigger actions when player state changes."""
+        debug("play_pause: {}".format(event))
+        if self.cur_or_sync(self.getCallbackPlayer(event)):
+            if event.split()[3] == "1":
+                self.playing = False
+            else:
+                self.playing = True
+            debug("Player playing state now: {}".format(self.playing))
+
+    @squeeze.event(squeeze.CLIENT_ALL)
+    def client_change(self, event=None):
+        """Method to trigger actions when client connects or disconnects."""
+        debug("client_change: {}".format(event))
+        self.get_squeeze_players()
+        if self.players:
+            self.get_info()
+
+    @squeeze.event(squeeze.VOLUME_CHANGE)
+    def vol_change(self, event=None):
+        """Method to trigger actions when volume changes."""
+        if self.getCallbackPlayer(event) == self.cur_player:
+            self.set_vol_label()
 
     ############ ACTIONS #######################################################
 
