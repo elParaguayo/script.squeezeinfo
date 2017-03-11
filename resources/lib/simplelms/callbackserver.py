@@ -67,8 +67,7 @@ class CallbackServer(Thread):
         self.username = username
         self.password = password
         self.is_connected = False
-        # if self.hostname:
-        #     self.connect()
+        self.cb_class = None
 
     def connect(self, update=True):
         """
